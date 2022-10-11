@@ -1,10 +1,10 @@
 <?php
 
 use App\Actions\TranslateJson;
+use Spatie\Browsershot\Browsershot;
 
-test('tranlation', function () {
-    $translate = new TranslateJson(new \Spatie\Browsershot\Browsershot(), new Symfony\Component\DomCrawler\Crawler());
+test('translation from pt to de', function () {
+    $translate = new TranslateJson(new Browsershot(), new Symfony\Component\DomCrawler\Crawler());
     $result = $translate->handle(['from' => 'pt-BR',"to" => 'de', 'translate'=> ['test' => "teste"]]);
-    dump($result);
-    expect($result)->toBe('Prüfung');
+    expect($result['test'])->toBe('Prüfung');
 });
