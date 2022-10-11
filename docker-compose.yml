@@ -1,0 +1,56 @@
+version: '3'
+services:
+  web:
+    image: michael891989/php:8.1-nginx
+    working_dir: /app
+    volumes:
+      - ./:/app
+    links:
+      - mysql
+      - redis
+    ports:
+      - '8086:8080'
+
+  worker:
+    image: aronpc/php:latest-alpine-laravel-worker
+    volumes:
+        - ./:/var/www/app
+        - composer:/var/www/app/.composer/
+        - config:/var/www/app/.config/
+        - ash_history:/var/www/app/.ash_history
+
+  mysql:
+    image: mariadb
+    ports:
+      - '3306:3306'
+    environment:
+        MARIADB_ROOT_PASSWORD: ${DB_PASSWORD}
+        MARIADB_DATABASE: ${DB_DATABASE}
+
+  redis:
+    image: redis
+
+
+  adminer:
+    image: adminer
+    ports:
+      - '8099:8080'
+
+  redis-compose:
+    image: redis
+    #command: redis-server --requirepass marmotamota --appendonly yes
+    #hostname: redis
+    ports:
+        - "6379:6379"
+    volumes:
+        - redis:/data/redis
+
+volumes:
+    redis:
+    composer:
+    ash_history:
+    config:
+
+networks:
+    app-network:
+        driver: "bridge"
