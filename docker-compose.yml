@@ -5,30 +5,30 @@ services:
     working_dir: /app
     volumes:
       - ./:/app
-    links:
-      - mysql
-      - redis
+ #   links:
+ #     - mysql
+ #     - redis
     ports:
       - '8086:8080'
 
-  worker:
-    image: aronpc/php:latest-alpine-laravel-worker
-    volumes:
-        - ./:/var/www/app
-        - composer:/var/www/app/.composer/
-        - config:/var/www/app/.config/
-        - ash_history:/var/www/app/.ash_history
+ # worker:
+ #   image: aronpc/php:latest-alpine-laravel-worker
+ #   volumes:
+ #       - ./:/var/www/app
+ #       - composer:/var/www/app/.composer/
+ #       - config:/var/www/app/.config/
+ #       - ash_history:/var/www/app/.ash_history
 
-  mysql:
-    image: mariadb
-    ports:
-      - '3306:3306'
-    environment:
-        MARIADB_ROOT_PASSWORD: ${DB_PASSWORD}
-        MARIADB_DATABASE: ${DB_DATABASE}
+  #mysql:
+  #  image: mariadb
+  #  ports:
+  #    - '3306:3306'
+  #  environment:
+  #      MARIADB_ROOT_PASSWORD: ${DB_PASSWORD}
+  #      MARIADB_DATABASE: ${DB_DATABASE}
 
-  redis:
-    image: redis
+  #redis:
+  #  image: redis
 
 
   adminer:
@@ -36,17 +36,17 @@ services:
     ports:
       - '8099:8080'
 
-  redis-compose:
-    image: redis
+  #redis-compose:
+  #  image: redis
     #command: redis-server --requirepass marmotamota --appendonly yes
     #hostname: redis
-    ports:
-        - "6379:6379"
-    volumes:
-        - redis:/data/redis
+  #  ports:
+  #      - "6379:6379"
+  #  volumes:
+  #      - redis:/data/redis
 
 volumes:
-    redis:
+    #redis:
     composer:
     ash_history:
     config:

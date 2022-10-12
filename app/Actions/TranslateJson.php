@@ -33,12 +33,12 @@ class TranslateJson
         $this->browsershot->setExtraNavigationHttpHeaders(["user-agent" => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36" ,
             'referer'=> 'https://www.google.com/']);
         $this->browsershot->waitUntilNetworkIdle();
-        $this->browsershot->addChromiumArguments(['headless' => false])->setOption('args', '--lang=de-at');
+        $this->browsershot->addChromiumArguments(['headless' => false]);
         $this->browsershot->delay(1000);
     }
 
     private function filterHtmlBody(string $html) {
-        $this->crawler = new DomCrawler($html);
+        $this->crawler->add($html);
         return $this->crawler->filter("span.Q4iAWc")->each(function(DomCrawler $node) {
             return $node->first()->innerText();
         });
