@@ -9,5 +9,6 @@ test('translation from pt to de', function () {
     $mockBrowsershot->expects('bodyHtml')->andReturn($pageContent);
     $translate = new TranslateJson($mockBrowsershot, new Symfony\Component\DomCrawler\Crawler());
     $result = $translate->handle(['from' => 'pt-BR', "to" => 'de', 'translate' => ['test' => "teste"]]);
+    dump($result);
     expect($result['test'])->toBe('Prüfung');
 });

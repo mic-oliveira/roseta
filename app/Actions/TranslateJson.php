@@ -11,15 +11,18 @@ class TranslateJson
 {
     use AsAction;
 
-    public function __construct(private Browsershot $browsershot, private DomCrawler $crawler)
+    private string $to;
+
+    public function __construct(private Browsershot $browsershot)
     {
     }
 
     public function handle($translate)
     {
         $translated = [];
+        $this->to = $translate['to'];
         foreach ($translate['translate'] as $key => $value) {
-            $this->requestTranslation($translate['from'],$translate['to'], $value);
+            $this->requestTranslation($translate['from'], $translate['to'], $value);
             $translated[$key] = $this->filterHtmlBody($this->browsershot->bodyHtml())[0] ?? $value;
         }
         return $translated;
@@ -38,8 +41,9 @@ class TranslateJson
     }
 
     private function filterHtmlBody(string $html) {
-        $this->crawler->add($html);
-        return $this->crawler->filter("span.Q4iAWc")->each(function(DomCrawler $node) {
+        $translateTo = $this->to;
+        $crawler = new DomCrawler($html);
+        return $crawler->filter('div span[lang="'.$translateTo.'"] span')->each(function(DomCrawler $node) {
             return $node->first()->innerText();
         });
     }
