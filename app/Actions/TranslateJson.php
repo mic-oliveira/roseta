@@ -2,10 +2,8 @@
 
 namespace App\Actions;
 
-use Illuminate\Support\Str;
 use Lorisleiva\Actions\Concerns\AsAction;
 use Spatie\Browsershot\Browsershot;
-use Spatie\Crawler\Crawler;
 use Symfony\Component\DomCrawler\Crawler as DomCrawler;
 
 class TranslateJson
@@ -13,27 +11,32 @@ class TranslateJson
     use AsAction;
 
     private string $to;
-    const SEPARATOR = ' || ';
+    const SEPARATOR = '|';
 
-    public function __construct(private Browsershot $browsershot)
+    private array $t = [];
+
+    public function __construct(private Browsershot $browsershot, private TranslateParser $parser, private ResponseParser $json)
     {
     }
 
     public function handle($translate)
     {
         $this->to = $translate['to'];
-        $toTranslate = $translate['translate'];
+        $toTranslate = $this->parser->handle($translate['translate']);
+
         $this->requestTranslation($translate['from'], $translate['to'], array_values($toTranslate));
         $translated = $this->filterHtmlBody($this->browsershot->bodyHtml());
-        return $this->parseResponse(array_keys($toTranslate), $translated);
+        return $this->json->handle($translate['translate'], $translated);
     }
 
     private function requestTranslation($from, $to, $word)
     {
 
         $s = urlencode(implode(self::SEPARATOR, $word));
+        // dd("https://translate.google.ca/?sl=${from}&tl=${to}&text=${s}&op=translate");
         $this->browsershot
             ->setUrl("https://translate.google.ca/?sl=${from}&tl=${to}&text=${s}&op=translate");
+
         $this->browsershot->noSandbox();
         $this->browsershot->setExtraNavigationHttpHeaders(["user-agent" => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36" ,
             'referer'=> 'https://www.google.com/']);
@@ -49,13 +52,5 @@ class TranslateJson
         return $crawler->filter('div span[lang="'.$translateTo.'"] span')->innerText();
     }
 
-    private function parseResponse(array $keys, String $text): array
-    {
-        $parse = explode(self::SEPARATOR, $text);
-        $parsedTranslation = [];
-        foreach ($keys as $index => $key) {
-            $parsedTranslation[$key] =  $parse[$index];
-        }
-        return $parsedTranslation;
-    }
+
 }
